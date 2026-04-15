@@ -1,0 +1,3 @@
+interface Prototype {
+    Prototype clone();
+}
