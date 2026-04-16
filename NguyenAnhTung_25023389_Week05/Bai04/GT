@@ -1,0 +1,77 @@
+1. Khai báo thuộc tính và khởi tạoJavaprivate Map<String, Integer> wordMap;
+
+public WordCounter() {
+    this.wordMap = new HashMap<>();
+}
+Map<String, Integer> wordMap: Khai báo một bảng băm. String là Key (lưu từ vựng), Integer là Value (lưu số lần xuất hiện).new HashMap<>(): Khởi tạo đối tượng cụ thể. HashMap giúp tra cứu từ cực nhanh với độ phức tạp $O(1)$.
+
+2. Phương thức analyze(String text)
+Đây là "trái tim" của chương trình, thực hiện qua 3 bước:
+
+Bước 1: Chuẩn hóa dữ liệu
+Java
+String cleanText = text.toLowerCase().replaceAll("[.,!?:;]", "");
+.toLowerCase(): Chuyển tất cả thành chữ thường. Nếu không, "Hello" và "hello" sẽ bị đếm thành 2 từ khác nhau.
+
+.replaceAll("[.,!?:;]", ""): Sử dụng Regex (biểu thức chính quy) để tìm các dấu câu và thay thế chúng bằng chuỗi rỗng (xóa đi). Việc này giúp từ "world." trở thành "world".
+
+Bước 2: Tách chuỗi
+Java
+String[] words = cleanText.split("\\s+");
+.split("\\s+"): Cắt chuỗi thành mảng các từ. \\s+ là ký hiệu cho khoảng trắng (bao gồm cả trường hợp có nhiều dấu cách liên tiếp).
+
+Bước 3: Đếm tần suất (Logic chính)
+Java
+for (String word : words) {
+    if (word.isEmpty()) continue; // Bỏ qua nếu là chuỗi rỗng
+
+    if (wordMap.containsKey(word)) {
+        // Nếu từ đã tồn tại trong Map
+        wordMap.put(word, wordMap.get(word) + 1);
+    } else {
+        // Nếu từ xuất hiện lần đầu
+        wordMap.put(word, 1);
+    }
+}
+wordMap.containsKey(word): Kiểm tra xem từ này đã từng được đưa vào Map chưa.
+
+wordMap.get(word) + 1: Lấy số lượng hiện tại ra, cộng thêm 1, sau đó put ngược lại để cập nhật.
+
+wordMap.put(word, 1): Nếu chưa có, ta đặt mốc đầu tiên là 1.
+
+3. Phương thức displayResult()
+Java
+for (Map.Entry<String, Integer> entry : wordMap.entrySet()) {
+    System.out.println(entry.getKey() + ": " + entry.getValue());
+}
+wordMap.entrySet(): Lấy ra một tập hợp các cặp Key-Value để duyệt.
+
+entry.getKey(): Trả về từ (String).
+
+entry.getValue(): Trả về số lần xuất hiện (Integer).
+
+4. Phương thức findMostFrequent()
+Java
+String mostFrequentWord = null;
+int maxCount = -1;
+
+for (Map.Entry<String, Integer> entry : wordMap.entrySet()) {
+    if (entry.getValue() > maxCount) {
+        maxCount = entry.getValue();
+        mostFrequentWord = entry.getKey();
+    }
+}
+maxCount = -1: Khởi tạo biến lưu giá trị lớn nhất.
+
+if (entry.getValue() > maxCount): Khi duyệt qua từng từ, nếu thấy từ nào có số lần xuất hiện lớn hơn maxCount hiện tại, ta sẽ cập nhật lại maxCount và lưu tên từ đó vào mostFrequentWord.
+
+Tóm tắt cơ chế bộ nhớ
+Khi bạn chạy chuỗi: "Hello world. Hello java"
+
+Duyệt "hello": Map trống -> Thêm {hello: 1}.
+
+Duyệt "world": Map chưa có "world" -> Thêm {hello: 1, world: 1}.
+
+Duyệt "hello": Map đã có "hello" -> Lấy 1 + 1 = 2. Cập nhật {hello: 2, world: 1}.
+
+Duyệt "java": Map chưa có "java" -> Thêm {hello: 2, world: 1, java: 1}.
