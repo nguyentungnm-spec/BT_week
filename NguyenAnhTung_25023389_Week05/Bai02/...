@@ -1,0 +1,72 @@
+1. Các lớp dữ liệu (Model Classes)
+Java
+class Customer {
+    int id;
+    String name;
+
+    public Customer(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Khách hàng [ID=" + id + ", Tên=" + name + "]";
+    }
+}
+id, name: Các thuộc tính cơ bản để định danh khách hàng.
+
+toString(): Ghi đè phương thức mặc định để khi chúng ta in đối tượng ra màn hình (ví dụ: System.out.println(customer)), nó sẽ hiển thị nội dung dễ đọc thay vì mã băm (hashcode).
+
+2. Cấu trúc dữ liệu chính trong hàm main
+Java
+Queue<Customer> customerQueue = new LinkedList<>();
+Queue<Customer>: Khai báo một hàng đợi chứa các đối tượng Customer.
+
+new LinkedList<>(): Trong Java, LinkedList triển khai interface Queue. Nó hoạt động theo cơ chế FIFO (First In, First Out - Vào trước, ra trước). Khách hàng nào vào hàng đợi trước sẽ được phục vụ trước.
+
+Java
+Stack<Message> messageHistory = new Stack<>();
+Stack<Message>: Khai báo một ngăn xếp chứa các tin nhắn.
+
+Hoạt động theo cơ chế LIFO (Last In, First Out - Vào sau, ra trước). Tin nhắn nào vừa gõ xong sẽ nằm trên cùng, phù hợp cho tính năng Undo.
+
+3. Các thao tác giả lập
+Java
+customerQueue.offer(new Customer(1, "Nguyễn Văn A"));
+offer(): Thêm một khách hàng mới vào cuối hàng đợi.
+
+Java
+Customer currentCustomer = queue.poll();
+poll(): Lấy ra và xóa phần tử ở đầu hàng đợi.
+
+Nếu hàng đợi rỗng, lệnh này trả về null. Đó là lý do có đoạn kiểm tra if (currentCustomer == null).
+
+4. Xử lý tin nhắn (Tính năng Undo/Peek)
+Java
+public static void typeMessage(Stack<Message> history, int id, String content) {
+    Message msg = new Message(id, content);
+    history.push(msg); // Thêm vào đỉnh Stack
+}
+push(): Đẩy một tin nhắn mới vào đỉnh ngăn xếp. Đây là hành động "gõ tin nhắn".
+
+Java
+System.out.println("Dòng tin nhắn cuối hiện tại: " + history.peek());
+peek(): Cho phép xem phần tử ở trên cùng của ngăn xếp nhưng không xóa nó. Giống như việc bạn nhìn vào dòng chữ cuối cùng mình vừa viết.
+
+Java
+System.out.println("-> Thực hiện UNDO dòng: " + history.pop());
+pop(): Lấy phần tử ở đỉnh ngăn xếp ra và xóa luôn phần tử đó. Đây chính là cơ chế của nút Undo (hoàn tác): xóa bỏ hành động gần nhất.
+
+5. Luồng hoạt động tổng thể
+Khách A, B vào: Hàng đợi lúc này là [A, B].
+
+Xử lý (lần 1): poll() lấy A ra. Hàng đợi còn [B].
+
+Gõ tin nhắn cho A: 3 tin nhắn được push() vào Stack.
+
+Undo: pop() xóa tin nhắn thứ 3 (tin nhắn mới nhất).
+
+Xử lý (lần 2): poll() lấy B ra. Hàng đợi trống [].
+
+Xử lý (lần 3): poll() trả về null -> In ra "Không còn khách đợi".
